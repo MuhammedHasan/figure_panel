@@ -1,0 +1,14 @@
+name: figure_panel
+channels:
+  - defaults
+dependencies:
+  - python
+  - pip
+  - pip:
+      - matplotlib
+      - seaborn
+      - numpy
+      - jupyter
+      - notebook
+      - pandas
+      - -e .
