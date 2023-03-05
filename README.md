@@ -3,8 +3,8 @@
 Create figure panel for publications from svg files.
 
 # Installation
-```
-pip install pip install git+https://github.com/muhammedhasan/figure_panel.git
+```bash
+pip install git+https://github.com/muhammedhasan/figure_panel.git
 ```
 
 # Usage
@@ -39,3 +39,4 @@ See [examples](examples/example.ipynb) for further examples and python api.
 - [] Add more test-cases
 - [] Margin between figures
 - [] Padding between figures and labels
+- [] pdf input support
