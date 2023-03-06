@@ -177,11 +177,12 @@ def _create_panel(figures: List[List[str]], width=1000, margin=0, fontsize=24, l
                 _y = _create_panel(y, **kwargs)[0]
 
                 if isinstance(x, list) and isinstance(y, list):
-                    return _x.margin_bottom(margin) / _y
+                    return [_x.margin_bottom(margin) / _y]
                 else:
                     return _x.margin_right(margin) + _y
 
-            return [reduce(_reduce, figures)]
+            panel = reduce(_reduce, figures)
+            return [panel] if not isinstance(panel, list) else panel
     else:
         raise ValueError(
             f"figures={figures} must be a list but found type={type(figures)}")
