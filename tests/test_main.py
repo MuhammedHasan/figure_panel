@@ -15,6 +15,13 @@ def test_parse_structure():
         ['x.svg', 'y.svg'],
         ['z.svg', 'k.svg']
     ]
+
+    assert parse_structure('[x.svg,y.svg],[z.svg, k.svg],[a.svg,b.svg]') == [
+        ['x.svg', 'y.svg'],
+        ['z.svg', 'k.svg'],
+        ['a.svg', 'b.svg']
+    ]
+
     assert parse_structure('[x.svg,y.svg],[z.svg]') == [
         ['x.svg', 'y.svg'],
         ['z.svg']

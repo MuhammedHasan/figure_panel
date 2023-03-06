@@ -1,5 +1,5 @@
 import click
-from .figure import create_panel
+from figure_panel.figure import create_panel
 
 
 def parse_structure(arg):

@@ -1,12 +1,9 @@
-import itertools
 import string
 import tempfile
 from itertools import product
 from functools import reduce
 from typing import List
 import svgutils.transform as sg
-from svglib.svglib import svg2rlg
-from reportlab.graphics import renderPDF, renderPM
 import cairosvg
 
 
@@ -143,7 +140,14 @@ def read_figure(self, path):
     return Figure.from_file(path)
 
 
-def create_panel(figures: List[List[str]], width=1000, margin=0, fontsize=24, letters=None, label_pad=0):
+def create_panel(figures: List[List[str]], width=1000,
+                 margin=0, fontsize=24, letters=None, label_pad=0):
+    return _create_panel(figures, width=width, margin=margin,
+                         fontsize=fontsize, letters=letters,
+                         label_pad=label_pad)[0]
+
+
+def _create_panel(figures: List[List[str]], width=1000, margin=0, fontsize=24, letters=None, label_pad=0):
     '''
     '''
     letters = letters or iter_letters()
@@ -151,22 +155,33 @@ def create_panel(figures: List[List[str]], width=1000, margin=0, fontsize=24, le
                   fontsize=fontsize, letters=letters)
 
     if isinstance(figures, str):
-        return Figure.from_file(figures).add_label(next(letters), fontsize=fontsize, pad=label_pad)
+        return [
+            Figure
+            .from_file(figures)
+            .add_label(next(letters), fontsize=fontsize, pad=label_pad)
+        ]
+    elif isinstance(figures, Figure):
+        return [figures]
     elif isinstance(figures, list):
-        if len(figures) == 1:
-            return create_panel(figures[0], **kwargs)
-        elif len(figures) == 0:
+        if len(figures) == 0:
             raise ValueError(
                 "Invalid input: row is empty and it must have at least one element")
-
-        def _reduce(x, y):
-            if isinstance(x, list) and isinstance(y, list):
-                return create_panel(x, **kwargs).margin_bottom(margin) / create_panel(y, **kwargs)
+        elif len(figures) == 1:
+            if isinstance(figures[0], str):
+                return _create_panel(figures[0], **kwargs)
             else:
-                return create_panel(x, **kwargs).margin_right(margin) + create_panel(y, **kwargs)
-        return reduce(_reduce, figures)
-    elif isinstance(figures, Figure):
-        return figures
+                return figures
+        else:
+            def _reduce(x, y):
+                _x = _create_panel(x, **kwargs)[0]
+                _y = _create_panel(y, **kwargs)[0]
+
+                if isinstance(x, list) and isinstance(y, list):
+                    return _x.margin_bottom(margin) / _y
+                else:
+                    return _x.margin_right(margin) + _y
+
+            return [reduce(_reduce, figures)]
     else:
         raise ValueError(
-            f"figures={figures} must be a list or str but found type={type(figures)}")
+            f"figures={figures} must be a list but found type={type(figures)}")
