@@ -3,6 +3,7 @@ import tempfile
 from itertools import product
 from functools import reduce
 from typing import List
+from PIL import Image
 import svgutils.transform as sg
 import cairosvg
 
@@ -78,11 +79,29 @@ class Figure:
         return Figure(fig.getroot(), self.height, self.width, labels=[label_el, *self.labels])
 
     @classmethod
-    def from_file(cls, svg_path: str):
+    def from_file(cls, path: str):
+        if str(path).endswith('.svg'):
+            return cls.from_svg(path)
+        elif str(path).endswith('.png'):
+            return cls.from_png(path)
+        else:
+            raise ValueError(
+                f"Invalid file type: {path}. Supported types are: .svg, .png")
+
+    @classmethod
+    def from_svg(cls, svg_path: str):
         fig = sg.fromfile(svg_path)
         root = fig.getroot()
         height = float(fig.height.replace('pt', ''))
         width = float(fig.width.replace('pt', ''))
+        return cls(root, height, width)
+
+    @classmethod
+    def from_png(cls, png_path: str):
+        img = Image.open(png_path)
+        height = float(img.height)
+        width = float(img.width)
+        root = sg.ImageElement(open(png_path, 'rb'), width, height)
         return cls(root, height, width)
 
     def __add__(self, other):

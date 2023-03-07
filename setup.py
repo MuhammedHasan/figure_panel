@@ -9,7 +9,8 @@ requirements = [
     'setuptools',
     'svgutils',
     'cairosvg',
-    'click'
+    'click',
+    'pillow'
 ]
 
 setup_requirements = ['pytest-runner', ]
