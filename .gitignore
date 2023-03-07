@@ -162,3 +162,5 @@ cython_debug/
 .vscode
 examples/*.svg
 examples/*.pdf
+examples/*.png
+!examples/example.png

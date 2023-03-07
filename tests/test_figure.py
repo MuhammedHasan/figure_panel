@@ -1,12 +1,12 @@
 from figure_panel import create_panel, read_figure as F
 
 
-def test_figure():
-    pass
-
-
 def test_create_figure_panel_1():
     create_panel(['tests/figs/a.svg', 'tests/figs/b.svg', 'tests/figs/c.svg'])
+
+
+def test_create_figure_panel_1_png():
+    create_panel(['tests/figs/a.png', 'tests/figs/b.svg', 'tests/figs/c.svg'])
 
 
 def test_create_figure_panel_2():
