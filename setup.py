@@ -8,7 +8,8 @@ with open('README.md') as readme_file:
 requirements = [
     'setuptools',
     'svgutils',
-    'cairosvg',
+#    'cairosvg',
+#    'wand',
     'click',
     'pillow'
 ]

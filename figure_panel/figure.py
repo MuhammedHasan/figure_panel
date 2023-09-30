@@ -5,10 +5,34 @@ from functools import reduce
 from typing import List
 from PIL import Image
 import svgutils.transform as sg
-import cairosvg
+
+
+def import_wand():
+    '''Import optional wand package'''
+    try:
+        from wand.image import Image as WandImage
+    except ImportError as exc:
+        raise ImportError(
+            "You must install wand package to save png, tiff, jpeg. "
+            "`conda install -c conda-forge wand`"
+        ) from exc
+    return WandImage
+
+
+def import_cairosvg():
+    '''Import optional cairosvg package'''
+    try:
+        import cairosvg
+    except ImportError as exc:
+        raise ImportError(
+            'You must install cairosvg package to save pdf, png, tiff, jpeg.'
+            '`conda install -c conda-forge cairosvg`'
+        ) from exc
+    return cairosvg
 
 
 def iter_letters():
+    """Iterate over letters from a to z and then aa, ab, ac, ..."""
     i = 1
     while True:
         for s in product(string.ascii_lowercase, repeat=i):
@@ -17,6 +41,21 @@ def iter_letters():
 
 
 class Figure:
+    '''
+    Figure class to create figure panels from svg files.
+
+    Args:
+        root (svgutils.transform.SVGFigure): Root svg element
+        height (float): Height of the figure
+        width (float): Width of the figure
+        labels (List[svgutils.transform.TextElement]): List of labels
+
+    Attributes:
+        root (svgutils.transform.SVGFigure): Root svg element
+        height (float): Height of the figure
+        width (float): Width of the figure
+        labels (List[svgutils.transform.TextElement]): List of labels
+    '''
 
     def __init__(self, root, height, width, labels=None):
         self.root = root
@@ -133,15 +172,37 @@ class Figure:
     def save_pdf(self, path):
         with tempfile.NamedTemporaryFile(suffix='.svg') as tmp:
             self.save_svg(tmp.name)
+            cairosvg = import_cairosvg()
             cairosvg.svg2pdf(
                 url=tmp.name, write_to=path, parent_width=self.width, parent_height=self.height)
         return self
 
     def save_png(self, path):
-        with tempfile.NamedTemporaryFile(suffix='.svg') as tmp:
-            self.save_svg(tmp.name)
-            cairosvg.svg2png(
-                url=tmp.name, write_to=path, parent_width=self.width, parent_height=self.height)
+        with tempfile.NamedTemporaryFile(suffix='.pdf') as tmp:
+            self.save_pdf(tmp.name)
+            WandImage = import_wand()
+            with WandImage(filename=tmp.name) as img:
+                img.format = 'png'
+                img.save(filename=path)
+        return self
+
+    def save_jpeg(self, path):
+        with tempfile.NamedTemporaryFile(suffix='.pdf') as tmp:
+            self.save_pdf(tmp.name)
+            WandImage = import_wand()
+            with WandImage(filename=tmp.name) as img:
+                img.format = 'jpeg'
+                img.save(filename=path)
+        return self
+
+    def save_tiff(self, path):
+        with tempfile.NamedTemporaryFile(suffix='.pdf') as tmp:
+            self.save_pdf(tmp.name)
+            WandImage = import_wand()
+            with WandImage(filename=tmp.name) as img:
+                img.format = 'tiff'
+                img.compression = 'lzw'
+                img.save(filename=path)
         return self
 
     def save(self, path):
@@ -151,27 +212,47 @@ class Figure:
             return self.save_pdf(path)
         elif path.endswith('.png'):
             return self.save_png(path)
+        elif path.endswith('.jpeg'):
+            return self.save_png(path)
+        elif path.endswith('.tiff'):
+            return self.save_tiff(path)
+        else:
+            raise ValueError(
+                f'Unsupported format file for: {path}'
+                'Supported formats are: .svg, .jpeg, .pdf, .png, .tiff'
+            )
 
 
 def read_figure(self, path):
     '''
+    Read svg file and return Figure object
     '''
     return Figure.from_file(path)
 
 
 def create_panel(figures: List[List[str]], width=1000,
                  margin=0, fontsize=24, letters=None, label_pad=0):
-    return _create_panel(figures, width=width, margin=margin,
+    '''
+    Create figure panel from svg files
+
+    Args:
+        figures (List[List[str]]): List of svg files
+        width (int): Width of the panel
+        margin (int): Margin between figures
+        fontsize (int): Fontsize of the labels
+        letters (Iterator[str]): Iterator over letters
+        label_pad (int): Padding of the labels
+    '''
+    return _create_panel(figures, margin=margin,
                          fontsize=fontsize, letters=letters,
-                         label_pad=label_pad)[0]
+                         label_pad=label_pad)[0].scale_width(width)
 
 
-def _create_panel(figures: List[List[str]], width=1000, margin=0, fontsize=24, letters=None, label_pad=0):
+def _create_panel(figures: List[List[str]], margin=0, fontsize=24, letters=None, label_pad=0):
     '''
     '''
     letters = letters or iter_letters()
-    kwargs = dict(width=width, margin=margin,
-                  fontsize=fontsize, letters=letters)
+    kwargs = dict(margin=margin, fontsize=fontsize, letters=letters)
 
     if isinstance(figures, str):
         return [
