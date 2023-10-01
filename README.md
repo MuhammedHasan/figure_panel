@@ -18,9 +18,9 @@ conda activate figure_panel
 pip install git+https://github.com/MuhammedHasan/figure_panel.git
 ```
 
-### Cairo-SVG installation
+### Cairo-SVG and Wand installation
 ```bash
-conda install -c conda-forge cairosvg -y
+conda install -c conda-forge cairosvg wand -y
 ```
 
 # Usage

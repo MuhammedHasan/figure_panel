@@ -15,7 +15,7 @@ requirements = [
     'pandas',
     'svgutils',
 #    'cairosvg',
-    'Wand',
+#    'wand',
     'click',
     'pillow'
 ]
