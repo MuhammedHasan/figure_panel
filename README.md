@@ -3,8 +3,24 @@
 Create figure panel for publications from svg files.
 
 # Installation
+### Creating a Python Environment
 ```bash
-pip install git+https://github.com/muhammedhasan/figure_panel.git
+conda create -n figure_panel python=3.9 -y
+```
+
+### Activate Created Environment
+```bash
+conda activate figure_panel
+```
+
+### figure_panel installation
+```bash
+pip install git+https://github.com/MuhammedHasan/figure_panel.git
+```
+
+### Cairo-SVG installation
+```bash
+conda install -c conda-forge cairosvg -y
 ```
 
 # Usage
