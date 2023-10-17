@@ -7,6 +7,12 @@ with open('README.md') as readme_file:
 
 requirements = [
     'setuptools',
+    'matplotlib',
+    'seaborn',
+    'numpy',
+    'jupyter',
+    'notebook',
+    'pandas',
     'svgutils',
 #    'cairosvg',
 #    'wand',
@@ -46,7 +52,7 @@ setup(
         [console_scripts]
         figure_panel=figure_panel.main:cli_figure_panel
     ''',
-    packages=find_packages(include=['lapa*']),
+    packages=find_packages(include=['figure_panel', 'figure_panel.*']),
     include_package_data=True,
 
     test_suite='tests',
