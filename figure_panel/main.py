@@ -32,9 +32,12 @@ def parse_structure(arg):
 @click.option('--output', '-o', type=str)
 @click.option('--width', type=float, default=1200)
 @click.option('--fontsize', type=float, default=24)
-def cli_figure_panel(figures, output, width, fontsize):
+@click.option('--fontsize', type=float, default=24)
+@click.option('--lettercase', type=str, default='lower')
+def cli_figure_panel(figures, output, width, fontsize, lettercase):
     figures = parse_structure(figures)
-    create_panel(figures, width=width, fontsize=fontsize).save(output)
+    create_panel(figures, width=width, fontsize=fontsize,
+                 lettercase=lettercase).save(output)
 
 # print(parse_structure('[abc.svg, [bd, c2], [d1, [ee, fa], gd]]'))
 # print(parse_structure('abc, d, c2'))

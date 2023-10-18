@@ -31,11 +31,19 @@ def import_cairosvg():
     return cairosvg
 
 
-def iter_letters():
+def iter_letters(case='lower'):
     """Iterate over letters from a to z and then aa, ab, ac, ..."""
     i = 1
+    if case == 'lower':
+        alphabet = string.ascii_lowercase
+    elif case == 'upper':
+        alphabet = string.ascii_uppercase
+    else:
+        raise ValueError(
+            f'Invalid case: {case}. Supported cases are: `lower`, `upper`')
+
     while True:
-        for s in product(string.ascii_lowercase, repeat=i):
+        for s in product(alphabet, repeat=i):
             yield ''.join(s)
         i += 1
 
@@ -213,7 +221,7 @@ class Figure:
         elif path.endswith('.png'):
             return self.save_png(path)
         elif path.endswith('.jpeg'):
-            return self.save_png(path)
+            return self.save_jpeg(path)
         elif path.endswith('.tiff'):
             return self.save_tiff(path)
         else:
@@ -230,8 +238,8 @@ def read_figure(self, path):
     return Figure.from_file(path)
 
 
-def create_panel(figures: List[List[str]], width=1000,
-                 margin=0, fontsize=24, letters=None, label_pad=0):
+def create_panel(figures: List[List[str]], width=1000, margin=0, fontsize=24,
+                 letters=None, label_pad=0, lettercase='lower'):
     '''
     Create figure panel from svg files
 
@@ -243,15 +251,17 @@ def create_panel(figures: List[List[str]], width=1000,
         letters (Iterator[str]): Iterator over letters
         label_pad (int): Padding of the labels
     '''
-    return _create_panel(figures, margin=margin,
-                         fontsize=fontsize, letters=letters,
-                         label_pad=label_pad)[0].scale_width(width)
+    return _create_panel(
+        figures, margin=margin, fontsize=fontsize, letters=letters,
+        label_pad=label_pad, lettercase=lettercase
+    )[0].scale_width(width)
 
 
-def _create_panel(figures: List[List[str]], margin=0, fontsize=24, letters=None, label_pad=0):
+def _create_panel(figures: List[List[str]], margin=0, fontsize=24,
+                  letters=None, label_pad=0, lettercase='lower'):
     '''
     '''
-    letters = letters or iter_letters()
+    letters = letters or iter_letters(lettercase)
     kwargs = dict(margin=margin, fontsize=fontsize, letters=letters)
 
     if isinstance(figures, str):
